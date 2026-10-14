@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Geant4
+build/
+*.root
+*.log
+
+# System
+.DS_Store

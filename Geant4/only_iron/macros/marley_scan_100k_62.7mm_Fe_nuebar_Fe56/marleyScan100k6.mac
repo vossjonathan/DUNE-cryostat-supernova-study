@@ -1,0 +1,101 @@
+/run/numberOfThreads 1
+/run/initialize
+/tracking/storeTrajectory 0
+/run/printProgress 10000
+
+/marley/nuEnergy 7.71375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_7.71375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 11.69375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_11.69375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 15.67375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_15.67375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 19.65375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_19.65375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 23.63375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_23.63375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 27.61375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_27.61375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 31.59375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_31.59375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 35.57375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_35.57375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 39.55375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_39.55375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 43.53375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_43.53375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 47.51375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_47.51375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 51.49375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_51.49375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 55.47375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_55.47375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 59.45375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_59.45375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 63.43375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_63.43375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 67.41375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_67.41375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 71.39375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_71.39375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 75.37375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_75.37375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 79.35375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_79.35375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 83.33375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_83.33375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 87.31375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_87.31375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 91.29375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_91.29375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 95.27375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_95.27375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 99.25375 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/62.7mm/marley_Fe56_100k_62.7mm_nuebar_Fe56/MARLEY_99.25375_nuebar_Fe56_ALLOWED_Fe56_62.7mm.root
+/run/beamOn 100000
+
