@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from config import IRON_CHANNELS, ENERGY_GRID, MODEL_INFORMATION, ARGON_CHANNELS
-from helper import calculate_iron_mass
 from pathlib import Path
 import uproot
 from matplotlib.colors import LogNorm

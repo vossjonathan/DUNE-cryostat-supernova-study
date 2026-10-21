@@ -25,8 +25,9 @@ def calculate_iron_mass(iron_thickness): #in mm
 
     return iron_mass / 1000 #in t
 
-
-def calculate_effective_iron_thickness(mass_t): #in t
+#calculate iron thicknes for the only iron cryostat model
+#The iron is directly next to the LAr
+def calculate_effective_iron_thickness_onlyiron(mass_t): #in t
     mass_kg = 1000 * mass_t
     iron_density = 7.87 * 1000 #in kg / m^3
 
@@ -51,6 +52,39 @@ def calculate_effective_iron_thickness(mass_t): #in t
     return positive_real_root[0] * 1000 # in mm
 
 
+#calculates thickness of outer iron layer
+#uses the more complex cryostat model including a 80cm polyurethane layer between the primary iron membrane and outer iron structure
+def calculate_outer_iron_thickness_with_PU(mass_t): #in t
+    mass_kg = 1000 * mass_t
+    iron_density = 7.87 * 1000 #in kg / m^3
+
+    argon_height = 14
+    argon_width = 15.1
+    argon_length = 62
+
+    primary_iron_thickness = 1.2e-3
+    PU_thickness = 0.8
+
+    combined_height = argon_height + 2 * (primary_iron_thickness + PU_thickness)
+    combined_width = argon_width + 2 * (primary_iron_thickness + PU_thickness)
+    combined_length = argon_length + 2 * (primary_iron_thickness + PU_thickness)
+
+    iron_volume = mass_kg / iron_density
+
+    cubic_coef = 8
+    quadratic_coef = 4*(combined_length + combined_height + combined_width)
+    linear_coef = 2*(combined_height*combined_width + combined_length*combined_width+combined_length*combined_height)
+    const_coef =  - iron_volume
+    coefficients = [cubic_coef, quadratic_coef, linear_coef, const_coef]  
+
+    roots = np.roots(coefficients)
+
+    positive_real_root = [root.real for root in roots if root.imag == 0 and root.real > 0]
+    if len(positive_real_root) != 1:
+        raise ValueError("Unexpected roots: ", roots)
+
+    return positive_real_root[0] * 1000 # in mm
+
 
 def apply_snowglobes_threshold(detector, material, threshold):
     
@@ -74,4 +108,5 @@ def apply_snowglobes_threshold(detector, material, threshold):
 
 if __name__ == "__main__":
     #apply_snowglobes_threshold("ar40kt", "argon", 0)
-    print(calculate_effective_iron_thickness(2038.1))
+    #print(calculate_effective_iron_thickness_onlyiron(2000))
+    print(calculate_outer_iron_thickness_with_PU(2000))

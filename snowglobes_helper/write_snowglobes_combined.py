@@ -1,7 +1,7 @@
 import numpy as np
 import uproot
 from pathlib import Path
-from config import MODEL_INFORMATION, ENERGY_GRID, IRON_THICKNESS_MM
+from config import MODEL_INFORMATION, ENERGY_GRID, DATA_LOOKUP
 
 
 SNOWGLOBES = Path.home()/"software"/"snowglobes"
@@ -28,13 +28,12 @@ def get_smearing_column(file):
 
     return column
 
-def build_smearing_matrix(channel, iron_thickness):
+def build_smearing_matrix(channel, layer):
 
     bin_centers = 0.5 * (ENERGY_GRID[:-1] + ENERGY_GRID[1:])
 
-    channel_config = MODEL_INFORMATION[channel]
+    channel_config = DATA_LOOKUP[layer]["channels"][channel]
     threshold = channel_config["scan_min_energy"]
-    simulation_config = channel_config["simulations"][iron_thickness]
 
     smearing_matrix = np.zeros((200, 200))
 
@@ -43,10 +42,10 @@ def build_smearing_matrix(channel, iron_thickness):
         if E < threshold:
             continue
 
-        folder = simulation_config["folder"]
-        filename = simulation_config["filename"].format(E=E)
+        folder = channel_config["folder"]
+        filename = channel_config["filename"].format(E=E)
         
-        file = ROOT_DATA/folder/filename
+        file = folder/filename
 
         if not file.exists():
             raise FileNotFoundError(f"{channel}: missing file at E = {E:.5f} MeV:\n{file}")
@@ -65,13 +64,20 @@ def build_smearing_matrix(channel, iron_thickness):
 
     return smearing_matrix
 
+def get_detector(layer):
+    if layer == "PrimaryIron":
+        return "FD_cryostat_primary"
+    elif layer == "OuterIron":
+        return "FD_cryostat_outer"
+    elif layer == "PU":
+        return "FD_cryostat_PU"
+    else:
+        raise ValueError("Not a valid layer")
 
-
-def write_snowglobes_matrix(smearing_matrix, channel, iron_thickness):
-    print(smearing_matrix.shape)
+def write_snowglobes_matrix(smearing_matrix, channel, layer):
     n_reco, n_true = smearing_matrix.shape
 
-    detector = f"FDSteel_{iron_thickness}mm"
+    detector = get_detector(layer)
     
     filename = SMEAR/f"{detector}"/f"smear_{channel}_{detector}.dat"
     with open(filename, "w") as f:
@@ -96,10 +102,15 @@ def write_snowglobes_matrix(smearing_matrix, channel, iron_thickness):
 
 
 if __name__ == "__main__":
-    iron_thicknesses = [62.7]
-    for iron_thickness in iron_thicknesses:
-        print("Building for: ", iron_thickness)
-        for channel in MODEL_INFORMATION.keys():
+    # matrix = build_smearing_matrix("ibd", "PU")
+    # print("Fraction of events which deposit any energy which land in first bin: ", matrix[0, :] / matrix.sum(axis = 0))
+    # print("first bin row: ", matrix[0, :] )
+    # print("axis = 0 sum: ", matrix.sum(axis = 0))
+
+    '''    layers = ["PrimaryIron", "PU", "OuterIron"]
+    for layer in layers:
+        print("Building for: ", layer)
+        for channel in DATA_LOOKUP[layer]["channels"].keys():
             print("Building for: ", channel)
-            matrix = build_smearing_matrix(channel, iron_thickness)
-            write_snowglobes_matrix(matrix, channel, iron_thickness)
+            matrix = build_smearing_matrix(channel, layer)
+            write_snowglobes_matrix(matrix, channel, layer)'''

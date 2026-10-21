@@ -1,13 +1,13 @@
 from config import ENERGY_GRID
 from pathlib import Path
 import numpy as np
-from config import MODEL_INFORMATION
+from config import MODEL_INFORMATION, DATA_LOOKUP
 
 FDSteel = Path.home()/"software"/"geant4"/"geant4-work"/"FDSteel"
 
 
 
-def macro_Geant4_Marley(n_events, n_jobs, channel, iron_thickness):
+def macro_Geant4_Marley_only_iron(n_events, n_jobs, channel, iron_thickness):
 
     min_energy = MODEL_INFORMATION[channel]["scan_min_energy"]
 
@@ -56,7 +56,106 @@ def macro_Geant4_Marley(n_events, n_jobs, channel, iron_thickness):
     f"./exampleB1 macros/{macro_dir}/marleyScan100k${{i}}.mac &\n"
     "done")
 
+def macro_Geant4_Marley_PU_iron(n_events, n_jobs, channel, layer):
 
+    config = DATA_LOOKUP[layer]["channels"][channel]
+
+    
+
+
+    min_energy = config["scan_min_energy"]
+    nuFlavor= config["pdg"]
+
+    macro_dir = f"marley_scan100k_{layer}_{channel}"
+    output_dir = f"marley_scan100k_{layer}_{channel}"
+
+    bin_edges = ENERGY_GRID
+    bin_centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
+    bin_centers = bin_centers[bin_centers >= min_energy]
+
+    build_dir = FDSteel / "build"
+
+    macro_path = build_dir / "macros"/macro_dir
+    output_path = build_dir /"root_data"/"iron_PU"/f"{layer}"/output_dir
+
+
+
+    macro_path.mkdir(parents=True, exist_ok=True)
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    for job in range(n_jobs):
+
+        energies = bin_centers[job::n_jobs]
+
+        with open(macro_path / f"marleyScan100k{job+1}.mac", "w") as f:
+
+            print("/run/numberOfThreads 1", file=f)
+            print("/run/initialize", file=f)
+            print("/tracking/storeTrajectory 0", file=f)
+            print("/run/printProgress 10000\n", file=f)
+            print(f"/marley/ironVolume {layer}", file = f)
+            print(f"/marley/nuFlavor {nuFlavor}", file = f)
+
+            for E in energies:
+
+                print(f"/marley/nuEnergy {E:.5f} MeV", file=f)
+
+                print(
+                    f"/analysis/setFileName "
+                    f"{output_path}/"
+                    f"MARLEY_{E:.5f}_{channel}_{layer}.root",
+                    file=f
+                )
+
+                print(f"/run/beamOn {n_events}\n", file=f)
+        
+    print("for i in {1..8}; do\n"
+    f"./exampleB1 macros/{macro_dir}/marleyScan100k${{i}}.mac &\n"
+    "done")
+
+def macro_IBD(n_events):
+
+    config = DATA_LOOKUP["PU"]["channels"]["ibd"]
+    min_energy = config["scan_min_energy"]
+
+
+    bin_edges = ENERGY_GRID
+    bin_centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
+    bin_centers = bin_centers[bin_centers >= min_energy]
+
+    build_dir = FDSteel / "build"
+
+    macro_path = build_dir / "macros"
+    output_path = config["folder"]
+
+
+
+    macro_path.mkdir(parents=True, exist_ok=True)
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    with open(macro_path / f"IBD_scan.mac", "w") as f:
+
+        print("/run/numberOfThreads 8", file=f)
+        print("/run/initialize", file=f)
+        print("/tracking/storeTrajectory 0", file=f)
+        print("/run/printProgress 10000\n", file=f)
+        print(f"/FDSteel/channel IBD", file = f)
+
+        for E in bin_centers:
+
+            filename = config["filename"].format(E=E)
+
+            print(f"/FDSteel/nuEnergy {E:.5f} MeV", file=f)
+
+            print(
+                f"/analysis/setFileName "
+                f"{output_path}/"
+                f"{filename}",
+                file=f
+            )
+
+            print(f"/run/beamOn {n_events}\n", file=f)
+        
 
 def macro_Geant4_Marley_missing(n_events=100000, n_jobs=8):
 
@@ -146,5 +245,11 @@ def macro_Geant4_Marley_missing(n_events=100000, n_jobs=8):
 
 
 if __name__ == "__main__":
-    macro_Geant4_Marley(100000, 8, channel = "numubar_e", iron_thickness=62.7)
+    #macro_Geant4_Marley(100000, 8, channel = "numubar_e", iron_thickness=62.7)
     #macro_Geant4_Marley_missing()
+    #macro_Geant4_Marley_PU_iron(100000, 8, "nue_Fe56", "OuterIron")
+    '''    for layer in ["PrimaryIron", "OuterIron"]:
+        channels = ["nuebar_Fe56", "nue_e", "nuebar_e", "numu_e", "numubar_e"]
+        for channel in channels:
+            macro_Geant4_Marley_PU_iron(100000, 8, channel, layer)'''
+    macro_IBD(100000)

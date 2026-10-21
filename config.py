@@ -47,7 +47,7 @@ ENERGY_GRID = np.linspace(0.5, 100, 201)
 
 ROOT_DATA = Path.home()/"software"/"geant4"/"geant4-work"/"FDSteel"/"build"/"root_data"
 
-
+#simplified model only one iron layer 
 MODEL_INFORMATION = {
     "nue_Fe56": {
         "pdg": 12,
@@ -228,6 +228,169 @@ MODEL_INFORMATION = {
         },
 
     },
+}
+#more complex model LAr -> primary iron layer -> polyurethane foam -> outer iron layer
+#numu <-> nutau
+#numubar <-> nutaubar
+DATA_LOOKUP = {
+    "PrimaryIron":{
+        "thickness": 1.2,
+
+        "channels": 
+        {
+            "nue_Fe56":
+            {
+                "scan_min_energy": 6.31,
+                "pdg": 12,
+                "folder": ROOT_DATA/"iron_PU"/"PrimaryIron"/"marley_scan100k_PrimaryIron_nue_Fe56",
+                "filename": "MARLEY_{E:.5f}_nue_Fe56_PrimaryIron.root", 
+                "weight":1,
+            },
+            "nuebar_Fe56":
+            {
+                "scan_min_energy": 5.1,
+                "pdg": -12,
+                "folder": ROOT_DATA/"iron_PU"/"PrimaryIron"/"marley_scan100k_PrimaryIron_nuebar_Fe56",
+                "filename": "MARLEY_{E:.5f}_nuebar_Fe56_PrimaryIron.root", 
+                "weight":1,
+            },
+            "nue_e":
+            {
+                "scan_min_energy": 0.5,
+                "pdg":12,
+                "folder": ROOT_DATA/"iron_PU"/"PrimaryIron"/"marley_scan100k_PrimaryIron_nue_e",
+                "filename": "MARLEY_{E:.5f}_nue_e_PrimaryIron.root",
+                "weight":26,
+            },
+            "nuebar_e":
+            {
+                "scan_min_energy": 0.5,
+                "pdg":-12,
+                "folder": ROOT_DATA/"iron_PU"/"PrimaryIron"/"marley_scan100k_PrimaryIron_nuebar_e",
+                "filename": "MARLEY_{E:.5f}_nuebar_e_PrimaryIron.root",
+                "weight":26,
+            },
+            "numu_e":
+            {
+                "scan_min_energy": 0.5,
+                "pdg":14,
+                "folder": ROOT_DATA/"iron_PU"/"PrimaryIron"/"marley_scan100k_PrimaryIron_numu_e",
+                "filename": "MARLEY_{E:.5f}_numu_e_PrimaryIron.root",
+                "weight":26,
+            },            
+            "numubar_e":
+            {
+                "scan_min_energy": 0.5,
+                "pdg":-14,
+                "folder": ROOT_DATA/"iron_PU"/"PrimaryIron"/"marley_scan100k_PrimaryIron_numubar_e",
+                "filename": "MARLEY_{E:.5f}_numubar_e_PrimaryIron.root",
+                "weight":26,
+            },            
+            "nutau_e":
+            {
+                "scan_min_energy": 0.5,
+                "pdg":16,
+                "folder": ROOT_DATA/"iron_PU"/"PrimaryIron"/"marley_scan100k_PrimaryIron_numu_e",
+                "filename": "MARLEY_{E:.5f}_numu_e_PrimaryIron.root",
+                "weight":26,
+            },        
+            "nutaubar_e":
+            {
+                "scan_min_energy": 0.5,
+                "pdg":-16,
+                "folder": ROOT_DATA/"iron_PU"/"PrimaryIron"/"marley_scan100k_PrimaryIron_numubar_e",
+                "filename": "MARLEY_{E:.5f}_numubar_e_PrimaryIron.root",
+                "weight":26,
+            },                
+        },
+    },
+    "PU":
+    {
+        "thickness": 800,
+        "channels":
+        {
+            "ibd":
+            {
+                "pdg": -12,
+                "scan_min_energy": 1.804,
+                "folder":ROOT_DATA/"iron_PU"/"PU"/"marley_scan100k_PU_ibd",
+                "filename": "MARLEY_{E:.5f}_ibd_PU.root",
+                "weight": 1,
+            }
+        }
+    },
+    "OuterIron":
+    {
+        "thickness": 54.63,
+        "channels":
+               {
+                    "nue_Fe56":
+                    {
+                        "scan_min_energy": 6.31,
+                        "pdg": 12,
+                        "folder": ROOT_DATA/"iron_PU"/"OuterIron"/"marley_scan100k_OuterIron_nue_Fe56",
+                        "filename": "MARLEY_{E:.5f}_nue_Fe56_OuterIron.root",
+                        "weight":1, 
+                    },
+                    "nuebar_Fe56":
+                    {
+                        "scan_min_energy": 5.1,
+                        "pdg": -12,
+                        "folder": ROOT_DATA/"iron_PU"/"OuterIron"/"marley_scan100k_OuterIron_nuebar_Fe56",
+                        "filename": "MARLEY_{E:.5f}_nuebar_Fe56_OuterIron.root", 
+                        "weight":1,
+                    },
+                    "nue_e":
+                    {
+                        "scan_min_energy": 0.5,
+                        "pdg":12,
+                        "folder": ROOT_DATA/"iron_PU"/"OuterIron"/"marley_scan100k_OuterIron_nue_e",
+                        "filename": "MARLEY_{E:.5f}_nue_e_OuterIron.root",
+                        "weight":26,
+                    },
+                    "nuebar_e":
+                    {
+                        "scan_min_energy": 0.5,
+                        "pdg":-12,
+                        "folder": ROOT_DATA/"iron_PU"/"OuterIron"/"marley_scan100k_OuterIron_nuebar_e",
+                        "filename": "MARLEY_{E:.5f}_nuebar_e_OuterIron.root",
+                        "weight":26,
+                    },
+                    "numu_e":
+                    {
+                        "scan_min_energy": 0.5,
+                        "pdg":14,
+                        "folder": ROOT_DATA/"iron_PU"/"OuterIron"/"marley_scan100k_OuterIron_numu_e",
+                        "filename": "MARLEY_{E:.5f}_numu_e_OuterIron.root",
+                        "weight":26,
+                    },            
+                    "numubar_e":
+                    {
+                        "scan_min_energy": 0.5,
+                        "pdg":-14,
+                        "folder": ROOT_DATA/"iron_PU"/"OuterIron"/"marley_scan100k_OuterIron_numubar_e",
+                        "filename": "MARLEY_{E:.5f}_numubar_e_OuterIron.root",
+                        "weight":26,
+                    },            
+                    "nutau_e":
+                    {
+                        "scan_min_energy": 0.5,
+                        "pdg":16,
+                        "folder": ROOT_DATA/"iron_PU"/"OuterIron"/"marley_scan100k_OuterIron_numu_e",
+                        "filename": "MARLEY_{E:.5f}_numu_e_OuterIron.root",
+                        "weight":26,
+                    },        
+                    "nutaubar_e":
+                    {
+                        "scan_min_energy": 0.5,
+                        "pdg":-16,
+                        "folder": ROOT_DATA/"iron_PU"/"OuterIron"/"marley_scan100k_OuterIron_numubar_e",
+                        "filename": "MARLEY_{E:.5f}_numubar_e_OuterIron.root",
+                        "weight":26,
+                    },                
+                },
+
+    }
 }
 
 if __name__ == "__main__":
