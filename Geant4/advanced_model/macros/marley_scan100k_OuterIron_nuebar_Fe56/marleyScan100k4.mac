@@ -1,0 +1,103 @@
+/run/numberOfThreads 1
+/run/initialize
+/tracking/storeTrajectory 0
+/run/printProgress 10000
+
+/marley/ironVolume OuterIron
+/marley/nuFlavor -12
+/marley/nuEnergy 6.71875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_6.71875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 10.69875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_10.69875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 14.67875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_14.67875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 18.65875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_18.65875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 22.63875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_22.63875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 26.61875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_26.61875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 30.59875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_30.59875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 34.57875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_34.57875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 38.55875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_38.55875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 42.53875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_42.53875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 46.51875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_46.51875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 50.49875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_50.49875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 54.47875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_54.47875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 58.45875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_58.45875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 62.43875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_62.43875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 66.41875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_66.41875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 70.39875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_70.39875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 74.37875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_74.37875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 78.35875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_78.35875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 82.33875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_82.33875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 86.31875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_86.31875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 90.29875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_90.29875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 94.27875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_94.27875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+
+/marley/nuEnergy 98.25875 MeV
+/analysis/setFileName /home/jonat/software/geant4/geant4-work/FDSteel/build/root_data/iron_PU/OuterIron/marley_scan100k_OuterIron_nuebar_Fe56/MARLEY_98.25875_nuebar_Fe56_OuterIron.root
+/run/beamOn 100000
+

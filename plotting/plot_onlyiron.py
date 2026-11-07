@@ -273,12 +273,20 @@ Events with $E_{{th}}$ = 5 MeV: {total_events_mask.sum():.2f}""",transform=plt.g
 def plot_all_argon_channels_smeared(flux, detector):
 
     total_events = np.zeros(200)
+    total_eES_events = np.zeros(200)
+
     for channel in ARGON_CHANNELS.keys():
         events_smeared = load_events_data(flux, detector, channel, smeared = True)
         weight = ARGON_CHANNELS[channel]
         events_smeared_w = events_smeared *weight
+        if channel.endswith("e"):
+            total_eES_events += events_smeared_w
+        if channel == "nue_Ar40":
+            plt.stairs(events_smeared_w, ENERGY_GRID, label = r"$\nu_e$ CC on Ar40", baseline= None)
+        if channel == "nuebar_Ar40":
+            plt.stairs(events_smeared_w, ENERGY_GRID, label = r"$\bar\nu_e$ CC on Ar40", baseline= None)
         total_events += events_smeared_w
-        plt.stairs(events_smeared_w, ENERGY_GRID, label = channel, baseline= None)
+    
 
     print("unmasked: ", total_events)
 
@@ -287,13 +295,30 @@ def plot_all_argon_channels_smeared(flux, detector):
     total_events_mask = total_events[mask]
     print("masked: ", total_events_mask)
 
+
+
+    plt.stairs(total_eES_events, ENERGY_GRID, label = "Total eES", baseline= None)
+
     plt.stairs(total_events, ENERGY_GRID, color = "black", linewidth = 1.6, baseline = None, label = "Total")
-    plt.xlim(0,60)
-    plt.xlabel("Deposited energy in LAr [MeV]")
-    plt.ylabel("Number of events per 0.5 MeV bin")
-    plt.legend()
-    plt.text(0.52, 0.36, rf"""Total events smeared: {total_events.sum():.2f}
-Events with $E_{{th}}$ = 5 MeV: {total_events_mask.sum():.2f}""",transform=plt.gca().transAxes, linespacing = 1.4)#,ha="right",va="top")
+    plt.axvline(
+    5,
+    color="gray",
+    linestyle="--",
+    linewidth=1.2,
+    alpha=0.8
+)
+    plt.xlim(0,50)
+    plt.xlabel("Deposited energy in LAr [MeV]", fontsize = 12)
+    plt.ylabel("Number of events per 0.5 MeV bin", fontsize = 12)
+
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+
+    plt.ylim(bottom=0)
+
+    plt.legend(fontsize = 12)
+    plt.text(0.48, 0.57, rf"""Total events smeared: {total_events.sum():.0f}
+Events with $E_{{th}}$ = 5 MeV: {total_events_mask.sum():.0f}""",transform=plt.gca().transAxes, linespacing = 1.4, fontsize = 12)#,ha="right",va="top")
     plt.grid(True, alpha = 0.3)
     #plt.title(f"{detector}, {flux}, {iron_thickness}mm, all iron channel")
     plt.savefig(f"plotting/{flux}_{detector}_argon_all_channels_smeared.svg", bbox_inches = "tight", dpi = 900)
@@ -447,7 +472,8 @@ if __name__ == "__main__":
     plot_deposition_efficiency(CHANNEL, iron_thickness=62.7, dep_threshold=5.0)
     #plot_unsmeared_events_iron("garching", "FDSteel_1.2mm", 1.2)'''
 
-    bar_plot_all_channels("garching")
+    plot_all_argon_channels_smeared("garching", "ar40kt")
+    #bar_plot_all_channels("garching")
     #bar_plot_event_count_comparison("garching", "nue_Fe56")
     #plot_all_iron_channels_smeared("garching", 62.7)
     #compare_deposition_effiencies("nue_Fe56", 5)

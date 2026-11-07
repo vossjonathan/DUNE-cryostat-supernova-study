@@ -1,0 +1,55 @@
+/run/numberOfThreads 1
+/run/initialize
+/tracking/storeTrajectory 0
+/tracking/verbose 0
+/run/verbose 0
+/run/printProgress 10000
+
+/marley/nuEnergy 8.70875 MeV
+/analysis/setFileName root_data/marley_CC_nue_Fe56_100k_12mm/MARLEY_8.70875_CC_nue_ALLOWED_Fe56_12mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 16.66875 MeV
+/analysis/setFileName root_data/marley_CC_nue_Fe56_100k_12mm/MARLEY_16.66875_CC_nue_ALLOWED_Fe56_12mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 24.62875 MeV
+/analysis/setFileName root_data/marley_CC_nue_Fe56_100k_12mm/MARLEY_24.62875_CC_nue_ALLOWED_Fe56_12mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 32.58875 MeV
+/analysis/setFileName root_data/marley_CC_nue_Fe56_100k_12mm/MARLEY_32.58875_CC_nue_ALLOWED_Fe56_12mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 40.54875 MeV
+/analysis/setFileName root_data/marley_CC_nue_Fe56_100k_12mm/MARLEY_40.54875_CC_nue_ALLOWED_Fe56_12mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 48.50875 MeV
+/analysis/setFileName root_data/marley_CC_nue_Fe56_100k_12mm/MARLEY_48.50875_CC_nue_ALLOWED_Fe56_12mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 56.46875 MeV
+/analysis/setFileName root_data/marley_CC_nue_Fe56_100k_12mm/MARLEY_56.46875_CC_nue_ALLOWED_Fe56_12mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 64.42875 MeV
+/analysis/setFileName root_data/marley_CC_nue_Fe56_100k_12mm/MARLEY_64.42875_CC_nue_ALLOWED_Fe56_12mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 72.38875 MeV
+/analysis/setFileName root_data/marley_CC_nue_Fe56_100k_12mm/MARLEY_72.38875_CC_nue_ALLOWED_Fe56_12mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 80.34875 MeV
+/analysis/setFileName root_data/marley_CC_nue_Fe56_100k_12mm/MARLEY_80.34875_CC_nue_ALLOWED_Fe56_12mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 88.30875 MeV
+/analysis/setFileName root_data/marley_CC_nue_Fe56_100k_12mm/MARLEY_88.30875_CC_nue_ALLOWED_Fe56_12mm.root
+/run/beamOn 100000
+
+/marley/nuEnergy 96.26875 MeV
+/analysis/setFileName root_data/marley_CC_nue_Fe56_100k_12mm/MARLEY_96.26875_CC_nue_ALLOWED_Fe56_12mm.root
+/run/beamOn 100000
+

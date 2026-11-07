@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from config import DATA_LOOKUP, ENERGY_GRID
+from config import DATA_LOOKUP, ENERGY_GRID, ARGON_CHANNELS
 from pathlib import Path
 import uproot
 from matplotlib.colors import LogNorm
@@ -106,10 +106,12 @@ def plot_distribution_matrix(channel, layer):
     matrix, dep_edges = build_distribution_matrix(channel, layer)
     print(matrix.sum(axis = 0))
     plt.imshow(matrix, origin = "lower", aspect = "auto",    extent=[ENERGY_GRID[0],ENERGY_GRID[-1],dep_edges[0],dep_edges[-1]], norm=LogNorm(vmin=1e-5, vmax=matrix.max()))
-    plt.xlabel(r"True neutrino energy $E_\nu$ [MeV]")
-    plt.ylabel(r"LAr deposited energy [MeV]")
-    plt.title(f"LAr energy deposition distribution for {channel}, {layer}")
-    plt.colorbar(label = "Probability")
+    plt.xlabel(r"True neutrino energy $E_\nu$ [MeV]", fontsize = 12)
+    plt.ylabel(r"LAr deposited energy [MeV]", fontsize = 12)
+    plt.xticks(fontsize = 11)
+    plt.yticks(fontsize = 11)
+    #plt.title(f"LAr energy deposition distribution for {channel}, {layer}")
+    plt.colorbar().set_label("Probability", fontsize=12)
     plt.savefig(f"plotting/energy_distribution_matrix_{channel}_{layer}.svg", bbox_inches = "tight", dpi = 900)
     plt.close()
 
@@ -250,18 +252,18 @@ def plot_one_channel_smeared_vs_unsmeared(flux, channel, layer):
     events_smeared_threshold = events_smeared[bin_centers > threshold]
 
 
-    plt.stairs(events_smeared, ENERGY_GRID, label = "Smeared: Reconstructed E", color = "blue")
-    plt.stairs(events_unsmeared, ENERGY_GRID, label = "Unsmeared: True E", color = "red")
+    plt.stairs(events_smeared, ENERGY_GRID, label = "LAr deposited energy", color = "tab:blue")
+    plt.stairs(events_unsmeared, ENERGY_GRID, label = r"Unsmeared: True $E_\nu$", color = "tab:red")
 
-    plt.text(0.52, 0.71,f"Total events unsmeared: {events_unsmeared.sum():.2f}\nTotal events smeared: {events_smeared.sum():.2f}\nEvents with > 5 MeV: {events_smeared_threshold.sum():.2f}",transform=plt.gca().transAxes)
-
-    plt.xlabel(r" E [MeV]")
+    plt.text(0.46, 0.63,f"Total events unsmeared: {events_unsmeared.sum():.2f}\nTotal events smeared: {events_smeared.sum():.2f}\nEvents with > 5 MeV: {events_smeared_threshold.sum():.2f}",transform=plt.gca().transAxes, linespacing = 1.4, fontsize = 12)
+    
+    plt.xlabel(r" Energy [MeV]", fontsize = 12)
     plt.xlim(0, 50)
-    plt.ylabel("Number of Events per bin")
-    plt.legend()
+    plt.ylabel("Number of Events per bin", fontsize = 12)
+    plt.legend(fontsize = 12)
     plt.grid(True, alpha=0.3)
 
-    plt.title(f"{detector}, {channel} unsmeared vs. smeared, {flux} flux")
+    #plt.title(f"{detector}, {channel} unsmeared vs. smeared, {flux} flux")
     plt.savefig(f"plotting/{flux}_{channel}_{detector}_smeared_vs_unsmeared_new.svg", bbox_inches = "tight", dpi = 900)
     plt.close()
 
@@ -289,16 +291,16 @@ def plot_all_iron_smeared_vs_unsmeared(flux, layer):
     events_smeared_nuebar_Fe56 = load_events_data(flux, detector, "nuebar_Fe56", smeared = True) * weight_nuebar
     events_unsmeared_nuebar_Fe56 = load_events_data(flux, detector, "nuebar_Fe56", smeared = False) * weight_nuebar
 
-    plt.plot([], [], color="gray", linestyle="--", label="unsmeared events")
+    #plt.plot([], [], color="gray", linestyle="--", label="unsmeared events")
 
-    plt.stairs(eES_events_unsmeared, ENERGY_GRID, color = "tab:green", linestyle = "--")
+    #plt.stairs(eES_events_unsmeared, ENERGY_GRID, color = "tab:green", linestyle = "--")
     plt.stairs(eES_events_smeared, ENERGY_GRID, label = "eES", color = "tab:green", linestyle = "-", baseline = None)
 
-    plt.stairs(events_unsmeared_nue_Fe56, ENERGY_GRID, color = "tab:blue", linestyle = "--")
-    plt.stairs(events_smeared_nue_Fe56, ENERGY_GRID, label = r"CC $\nu_e$", color = "tab:blue", linestyle = "-", baseline = None)
+    #plt.stairs(events_unsmeared_nue_Fe56, ENERGY_GRID, color = "tab:blue", linestyle = "--")
+    plt.stairs(events_smeared_nue_Fe56, ENERGY_GRID, label = r"$\nu_e$ CC on 56Fe", color = "tab:blue", linestyle = "-", baseline = None)
 
-    plt.stairs(events_unsmeared_nuebar_Fe56, ENERGY_GRID, color = "tab:orange", linestyle = "--")
-    plt.stairs(events_smeared_nuebar_Fe56, ENERGY_GRID, label = r"CC $\bar\nu_e$", color = "tab:orange", linestyle = "-", baseline = None)
+    #plt.stairs(events_unsmeared_nuebar_Fe56, ENERGY_GRID, color = "tab:orange", linestyle = "--")
+    plt.stairs(events_smeared_nuebar_Fe56, ENERGY_GRID, label = r"$\bar\nu_e$ CC on 56Fe", color = "tab:orange", linestyle = "-", baseline = None)
 
 
     total_events_unsmeared = eES_events_unsmeared + events_unsmeared_nue_Fe56 + events_unsmeared_nuebar_Fe56
@@ -310,18 +312,99 @@ def plot_all_iron_smeared_vs_unsmeared(flux, layer):
 
     plt.stairs(total_events_smeared, ENERGY_GRID, color = "black", linestyle = "-", label = "Total smeared", linewidth = 1.6, baseline = None)
 
-    plt.text(0.56, 0.53,f"Total events unsmeared: {total_events_unsmeared.sum():.2f}\nTotal events smeared: {total_events_smeared.sum():.2f}\nEvents with > 5 MeV: {total_threshold.sum():.2f}",transform=plt.gca().transAxes, linespacing = 1.4)
-
-    plt.xlabel(r"Smeared: E in LAr, Unsmeared: $E_\nu$ [MeV]")
-    plt.xlim(0, 50)
-    plt.ylabel("Number of Events per bin")
-    plt.legend()
+    plt.text(0.47, 0.50,f"Total events unsmeared: {total_events_unsmeared.sum():.2f}\nTotal events smeared: {total_events_smeared.sum():.2f}\nEvents with > 5 MeV: {total_threshold.sum():.2f}",transform=plt.gca().transAxes, linespacing = 1.4, fontsize = 12)
+    plt.xticks(fontsize = 12)
+    plt.yticks(fontsize = 12)
+    plt.ylim(bottom = 0)
+    plt.axvline(5,color="gray",linestyle="--",linewidth=1.2,alpha=0.8)
+    plt.xlabel(r"Energy deposited in LAr [MeV]", fontsize = 12)
+    plt.xlim(0, 20)
+    plt.ylabel("Number of Events per bin", fontsize = 12)
+    plt.legend(fontsize = 12)
     plt.grid(True, alpha=0.3)
 
     #plt.title(f"All implemented Fe channels, {flux}, {detector}")
     plt.savefig(f"plotting/{flux}__{detector}_all_iron.svg", bbox_inches = "tight", dpi = 900)
     plt.close()
 
+def plot_all_argon_channels_smeared_and_cryostat(flux, detector):
+    total_cryostat_events = np.zeros(200)
+
+    total_PrimaryIron_events = np.zeros(200)
+    total_PU_events = np.zeros(200)
+    total_OuterIron_events = np.zeros(200)
+
+    layers = ["PrimaryIron", "PU", "OuterIron"]
+    for layer in layers:
+        channel_config = DATA_LOOKUP[layer]["channels"]
+        detector_cryostat = get_detector(layer)
+        for channel in channel_config.keys():
+            events_smeared = load_events_data(flux, detector_cryostat, channel, True) * channel_config[channel]["weight"]
+            if layer == "PrimaryIron":
+                total_PrimaryIron_events += 4 * events_smeared
+            elif layer == "PU":
+                total_PU_events += 4 * events_smeared
+            elif layer == "OuterIron":
+                total_OuterIron_events += 4 * events_smeared
+            total_cryostat_events += 4 * events_smeared
+
+    total_events = np.zeros(200)
+    total_eES_events = np.zeros(200)
+
+    for channel in ARGON_CHANNELS.keys():
+        events_smeared = load_events_data(flux, detector, channel, smeared = True)
+        weight = ARGON_CHANNELS[channel]
+        events_smeared_w = events_smeared *weight
+        if channel.endswith("e"):
+            total_eES_events += events_smeared_w
+        if channel == "nue_Ar40":
+            plt.stairs(events_smeared_w, ENERGY_GRID, label = r"$\nu_e$ CC on LAr", baseline= None)
+        if channel == "nuebar_Ar40":
+            plt.stairs(events_smeared_w, ENERGY_GRID, label = r"$\bar\nu_e$ CC on LAr", baseline= None)
+        total_events += events_smeared_w
+    
+
+    print("unmasked: ", total_events)
+
+    bin_centers = 0.5 * (ENERGY_GRID[:-1] + ENERGY_GRID[1:])
+    mask = bin_centers > 5
+    total_events_mask = total_events[mask]
+    total_cryostat_mask = total_cryostat_events[mask]
+    print("masked: ", total_events_mask)
+    print("Cryostat total:", total_cryostat_events.sum())
+    print("Cryostat > 5 MeV:", total_cryostat_events[mask].sum())
+    print("LAr > 5 MeV:", total_events[mask].sum())
+
+    print(
+        "Relative contribution:",
+        100 * total_cryostat_events[mask].sum()
+        / total_events[mask].sum(),
+        "%"
+)
+
+
+    plt.stairs(total_eES_events, ENERGY_GRID, label = "Total eES", baseline= None)
+    
+    plt.stairs(total_events, ENERGY_GRID, color = "black", linewidth = 1.6, baseline = None, label = "Total LAr signal")
+    plt.stairs(total_cryostat_events, ENERGY_GRID, label = "Cryostat contribution", baseline = None, color = "maroon", linewidth = 1.6)
+    plt.axvline(5,color="gray",linestyle="--",linewidth=1.2,alpha=0.8)
+    plt.xlim(0,50)
+    plt.xlabel("Deposited energy in LAr [MeV]", fontsize = 12)
+    plt.ylabel("Number of events per 0.5 MeV bin", fontsize = 12)
+
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+
+    plt.ylim(bottom=0)
+
+    plt.legend(fontsize = 12)
+    plt.text(0.47, 0.44, rf"""LAr events > 5 MeV: {total_events_mask.sum():.1f}
+Smeared cryostat events: {total_cryostat_events.sum():.1f}
+Cryostat events > 5 MeV: {total_cryostat_mask.sum():.1f}""",transform=plt.gca().transAxes, linespacing = 1.4, fontsize = 12)#,ha="right",va="top")
+    plt.grid(True, alpha = 0.3)
+    #plt.title(f"{detector}, {flux}, {iron_thickness}mm, all iron channel")
+    plt.savefig(f"plotting/{flux}_{detector}_argon_all_channels_and_cryostat_smeared.svg", bbox_inches = "tight", dpi = 900)
+    plt.close()
 
 if __name__ == "__main__":
     '''   layers = ["PrimaryIron", "OuterIron"]
@@ -333,10 +416,15 @@ if __name__ == "__main__":
             plot_deposition_efficiency(channel, layer, 0.5)
             plot_deposition_efficiency(channel, layer, 5.0)
     '''
+
+    #plot_all_iron_smeared_vs_unsmeared("garching", "PrimaryIron")
+    #plot_all_iron_smeared_vs_unsmeared("garching", "OuterIron")
+    #plot_one_channel_smeared_vs_unsmeared("garching", "ibd", "PU")
+    plot_all_argon_channels_smeared_and_cryostat("garching", "ar40kt")
     #plot_distribution_matrix("ibd", "PU")
     #plot_deposition_efficiency("ibd", "PU", 0.0)
     #plot_deposition_efficiency("ibd", "PU", 0.4)
-
+    #plot_one_channel_smeared_vs_unsmeared("garching", "ibd", "PU")
     #plot_unsmeared_events_iron("garching", "FD_cryostat_primary")
     #plot_unsmeared_events_iron("garching", "FD_cryostat_outer")
     #plot_one_channel_weighted("garching", "FD_cryostat_PU", "ibd", smeared = False)
@@ -357,7 +445,8 @@ if __name__ == "__main__":
             f"Edep > {threshold:.1f} MeV: "
             f"{events:.4f} events"
         )'''
-
+    #plot_distribution_matrix("ibd", "PU")
+    #plot_distribution_matrix("nue_Fe56", "OuterIron")
     #plot_one_channel_smeared_vs_unsmeared("garching", "ibd", "PU")
     '''    energies = 0.5 * (ENERGY_GRID[:-1] + ENERGY_GRID[1:])
     E = energies[np.argmin(np.abs(energies - 15.0))]
@@ -411,4 +500,4 @@ if __name__ == "__main__":
     print("SNOwGLoBES first bin:", smeared[0])
     print("Difference:", first_bin_direct - smeared[0])'''
     #plot_all_iron_smeared_vs_unsmeared("garching", "PrimaryIron")
-    plot_all_iron_smeared_vs_unsmeared("garching", "OuterIron")
+    #plot_all_iron_smeared_vs_unsmeared("garching", "OuterIron")
