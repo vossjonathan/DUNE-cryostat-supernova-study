@@ -1,5 +1,3 @@
-// Use this example job configuration file as a starting point for your own
-// files.
 {
   seed: 123456, // Random number seed (omit to use time since Unix epoch)
 
@@ -9,13 +7,7 @@
   },
   form_factors: "allowed",
   reactions: [
-    // Charged-current interactions on the nucleus using the
-    // recommended MARLEY v2 cross-section models for both
-    // continuum (HF-CRPA) and discrete (Bhattacharya2009)
-    // nuclear transitions
-    //"/home/jonat/software/marley/data/react/ve56FeCC_Paar2015.react",
-    //"/home/jonat/software/marley/data/react/ve56FeCC_Paar2015_no_8.react",
-    "/home/jonat/software/marley/data/react/ES.react",
+     "/home/jonat/software/marley/data/react/ES.react",
   ],
 
   // Neutrino source specification

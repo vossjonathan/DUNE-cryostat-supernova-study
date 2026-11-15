@@ -1,4 +1,3 @@
-
 {
   seed: 123456, // Random number seed (omit to use time since Unix epoch)
 
