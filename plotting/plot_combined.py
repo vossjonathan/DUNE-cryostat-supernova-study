@@ -101,7 +101,7 @@ def plot_unsmeared_events_iron(flux, detector, layer):
     plt.close()
 
 
-def plot_distribution_matrix(channel, layer):
+def plot_distribution_matrix(channel, layer, title):
 
     matrix, dep_edges = build_distribution_matrix(channel, layer)
     print(matrix.sum(axis = 0))
@@ -110,9 +110,10 @@ def plot_distribution_matrix(channel, layer):
     plt.ylabel(r"LAr deposited energy [MeV]", fontsize = 12)
     plt.xticks(fontsize = 11)
     plt.yticks(fontsize = 11)
-    #plt.title(f"LAr energy deposition distribution for {channel}, {layer}")
+    if title:
+        plt.title(f"LAr energy deposition distribution for {channel}, {layer}")
     plt.colorbar().set_label("Probability", fontsize=12)
-    plt.savefig(f"plotting/energy_distribution_matrix_{channel}_{layer}.svg", bbox_inches = "tight", dpi = 900)
+    plt.savefig(f"plotting/energy_distribution_matrix_{channel}_{layer}.pdf", bbox_inches = "tight", dpi = 900)
     plt.close()
 
 def plot_hist_neutrino_energy(channel, layer, energy):
@@ -407,6 +408,9 @@ Cryostat events > 5 MeV: {total_cryostat_mask.sum():.1f}""",transform=plt.gca().
     plt.close()
 
 if __name__ == "__main__":
+
+    plot_distribution_matrix("nue_Fe56", "PrimaryIron", False)
+    plot_distribution_matrix("nue_Fe56", "OuterIron",  False)
     '''   layers = ["PrimaryIron", "OuterIron"]
     for layer in layers:
         channels = DATA_LOOKUP[layer]["channels"]
@@ -420,7 +424,7 @@ if __name__ == "__main__":
     #plot_all_iron_smeared_vs_unsmeared("garching", "PrimaryIron")
     #plot_all_iron_smeared_vs_unsmeared("garching", "OuterIron")
     #plot_one_channel_smeared_vs_unsmeared("garching", "ibd", "PU")
-    plot_all_argon_channels_smeared_and_cryostat("garching", "ar40kt")
+    #plot_all_argon_channels_smeared_and_cryostat("garching", "ar40kt")
     #plot_distribution_matrix("ibd", "PU")
     #plot_deposition_efficiency("ibd", "PU", 0.0)
     #plot_deposition_efficiency("ibd", "PU", 0.4)
