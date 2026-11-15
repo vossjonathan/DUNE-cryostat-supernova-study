@@ -22,10 +22,15 @@ find_package(Geant4 REQUIRED ui_all vis_all)
 #----------------------------------------------------------------------------
 # MARLEY / HepMC3 locations
 #
-set(MARLEY_DIR "/home/jonat/software/marley")
+set(MARLEY_DIR "$ENV{HOME}/software/marley" CACHE PATH "Path to MARLEY installation")
 
-set(MARLEY_INCLUDE_DIR
-    "${MARLEY_DIR}/include"
+if(NOT MARLEY_DIR)
+    message(FATAL_ERROR
+        "Please specify MARLEY_DIR when configuring CMake.")
+endif()
+
+set(HEPMC3_INCLUDE_DIR
+    "${MARLEY_DIR}/include/builtin"
 )
 
 set(MARLEY_LIBRARY
@@ -112,23 +117,3 @@ set_target_properties(
     BUILD_RPATH "${MARLEY_DIR}/build/lib"
 )
 
-
-#----------------------------------------------------------------------------
-# Copy macro/configuration scripts into build directory
-#
-set(EXAMPLEB1_SCRIPTS
-    exampleB1.in
-    exampleB1.out
-    init_vis.mac
-    run1.mac
-    run2.mac
-    vis.mac
-)
-
-foreach(_script ${EXAMPLEB1_SCRIPTS})
-    configure_file(
-        "${PROJECT_SOURCE_DIR}/${_script}"
-        "${PROJECT_BINARY_DIR}/${_script}"
-        COPYONLY
-    )
-endforeach()
