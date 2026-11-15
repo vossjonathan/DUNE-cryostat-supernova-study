@@ -1,11 +1,10 @@
+"""Paths and unchanged scientific configuration for historical and final studies."""
 import numpy as np
 from pathlib import Path
-
+import os
 
 IRON_THICKNESS_MM = 62.7 #1.2mm lower bound
-#IRON_MASS_T = calculate_iron_mass(IRON_THICKNESS_MM) #in t
-#SNOWGLOBES_IRON_MASS = 2300 #in t DIFFERENT SNOWGLOBES MODELS FOR ALL THICKNESSES
-#MASS_SCALE = IRON_MASS_T / SNOWGLOBES_IRON_MASS
+# Electron scattering is per atomic electron: Ar has 18, Fe has 26.
 ARGON_CHANNELS = {
         "nue_Ar40" : 1,
         "nuebar_Ar40" : 1,
@@ -45,8 +44,21 @@ IRON_CHANNELS = {
 
 ENERGY_GRID = np.linspace(0.5, 100, 201)
 
-ROOT_DATA = Path.home()/"software"/"geant4"/"geant4-work"/"FDSteel"/"build"/"root_data"
 
+PROJECT_ROOT = Path(__file__).resolve().parent
+
+# Environment overrides preserve external simulation data in its existing location.
+GEANT4_BUILD_DIR = Path(os.environ.get("GEANT4_BUILD_DIR", PROJECT_ROOT / "Geant4" / "build")).expanduser()
+ROOT_DATA = Path(os.environ.get("FDSTEEL_ROOT_DATA", PROJECT_ROOT / "data" / "root")).expanduser()
+SNOWGLOBES_DIR = Path(os.environ.get("SNOWGLOBES_DIR", PROJECT_ROOT / "snowglobes")).expanduser()
+PLOT_DIR = Path(os.environ.get("PLOT_DIR", PROJECT_ROOT / "figures" / "python")).expanduser()
+SNOWGLOBES = SNOWGLOBES_DIR  # Compatibility for existing Python callers.
+ENERGY_BIN_CENTERS = 0.5 * (ENERGY_GRID[:-1] + ENERGY_GRID[1:])
+
+# Historical only-iron model; thicknesses are in mm.
+# Neutral-current entries in IRON_CHANNELS are historical, not final simulations.
+# Muon/tau electron scattering shares the same neutral-current response at
+# these energies; antineutrinos likewise reuse the corresponding antimuon files.
 #simplified model only one iron layer 
 MODEL_INFORMATION = {
     "nue_Fe56": {
@@ -58,8 +70,6 @@ MODEL_INFORMATION = {
             12: {       #in mm
                 "folder": ROOT_DATA /"12mm"/ "marley_CC_nue_Fe56_100k_12mm",
                 "filename": "MARLEY_{E:.5f}_CC_nue_ALLOWED_Fe56_12mm.root",
-                #"folder": ROOT_DATA / "marley_CC_nue_Fe56_10k_12mm_no_8",
-                #"filename": "MARLEY_{E:.5f}_CC_nue_ALLOWED_Fe56_12mm.root",
             },
 
             1.2:
@@ -229,7 +239,7 @@ MODEL_INFORMATION = {
 
     },
 }
-#more complex model LAr -> primary iron layer -> polyurethane foam -> outer iron layer
+# Final cryostat: LAr -> PrimaryIron -> PU -> OuterIron (thicknesses in mm).
 #numu <-> nutau
 #numubar <-> nutaubar
 DATA_LOOKUP = {

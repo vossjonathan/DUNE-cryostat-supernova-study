@@ -5,29 +5,37 @@ from pathlib import Path
 import uproot
 from matplotlib.colors import LogNorm
 
-OUT = Path.home()/"software"/"snowglobes"/"out"
-ROOT_DATA = Path.home()/"software"/"geant4"/"geant4-work"/"FDSteel"/"build"/"root_data"
-SNOWGLOBES = Path.home()/"software"/"snowglobes"
+from config import SNOWGLOBES_DIR, ROOT_DATA, PLOT_DIR, ENERGY_BIN_CENTERS
 
-#HELPER FUNCTION
+OUT = SNOWGLOBES_DIR / "out"
+
+
+def _savefig(filename, **kwargs):
+
+    destination = PLOT_DIR / Path(filename).name
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    if destination.exists():
+        raise FileExistsError(f"Figure already exists: {destination}; choose a new PLOT_DIR")
+    plt.savefig(destination, **kwargs)
+
+
+#HELPER FUNCTIONS
 
 
 def load_events_data(flux, detector, channel, smeared, suffix = "" ):
-    if smeared:
-        file = OUT/f"{flux}_{channel}_{detector}_events_smeared_unweighted{suffix}.dat"
-        data = np.loadtxt(file, max_rows = 200)
-        events = data[:, 1]
-        return events
 
+    ending = f"smeared_unweighted{suffix}" if smeared else "unweighted"
+    file = OUT / f"{flux}_{channel}_{detector}_events_{ending}.dat"
+    data = np.loadtxt(file, max_rows=len(ENERGY_BIN_CENTERS), ndmin=2)
+    if data.shape[0] != len(ENERGY_BIN_CENTERS) or data.shape[1] < 2:
+        raise ValueError(f"{file}: expected {len(ENERGY_BIN_CENTERS)} rows and at least two columns")
+    if not np.isfinite(data).all() or (data[:, 1] < 0).any():
+        raise ValueError(f"{file}: expected finite nonnegative event counts")
+    return data[:, 1]
 
-    else:
-        file = OUT/f"{flux}_{channel}_{detector}_events_unweighted.dat"
-        data = np.loadtxt(file, max_rows = 200)
-        events = data[:, 1]
-        print(events.shape)
-        return events
 
 def get_root_file(channel, iron_thickness, energy):
+
     channel_info = MODEL_INFORMATION[channel]
     simulation_info = channel_info["simulations"][iron_thickness]
 
@@ -37,36 +45,42 @@ def get_root_file(channel, iron_thickness, energy):
 
 
 def load_Edep(channel, iron_thickness, energy):
+
     root_file = get_root_file(channel, iron_thickness, energy)
 
     with uproot.open(root_file) as file:
         Edep = file["FDSteel"]["EdepLAr"].array(library="np")
 
+    if Edep.ndim != 1 or not len(Edep) or not np.isfinite(Edep).all():
+        raise ValueError(f"{root_file}: expected nonempty finite scalar deposited energies in MeV")
     return Edep
 
 #ANALYSIS FUNCTIONS
 
 def get_single_energy_distribution(channel, iron_thickness, energy, dep_edges):
+
     Edep = load_Edep(channel, iron_thickness, energy)
     n_generated = len(Edep)
+    if not n_generated or not np.isfinite(Edep).all():
+        raise ValueError("Expected nonempty, finite deposited energies in MeV")
 
     counts, _ = np.histogram(Edep, bins = dep_edges)
     column = counts  / n_generated
     return column
 
-    
+
 def build_distribution_matrix(channel, iron_thickness):
+
     channel_info = MODEL_INFORMATION[channel]
     scan_min_energy = channel_info["scan_min_energy"]
 
-    energies = 0.5 * (ENERGY_GRID[:-1] + ENERGY_GRID[1:])
+    energies = ENERGY_BIN_CENTERS
     dep_edges = ENERGY_GRID
 
     n_true_bins = len(energies)
     n_dep_bins = len(dep_edges) - 1
     distribution_matrix = np.zeros((n_dep_bins, n_true_bins))
 
-    print("dep_edges: ", dep_edges)
     for i, E in enumerate(energies):
         if E < scan_min_energy:
             continue
@@ -79,6 +93,7 @@ def build_distribution_matrix(channel, iron_thickness):
 
 
 def plot_unsmeared_events_iron(flux, detector, iron_thickness):
+
     total_events = 0
     for channel in MODEL_INFORMATION.keys():
         events_load = load_events_data(flux, detector, channel, smeared = False)
@@ -93,10 +108,11 @@ def plot_unsmeared_events_iron(flux, detector, iron_thickness):
     plt.grid(True, alpha = 0.3)
     #plt.title(f"Unsmeared spectrum {detector}, {flux}, {iron_thickness}mm")
     plt.text(x = 0.71, y = 0.5, s = f"Total: {total_events:.2f}", transform = plt.gca().transAxes, ha = "left", va = "top")
-    plt.savefig(f"plotting/{flux}_{detector}_unsmeared_spectrum_{iron_thickness}mm.svg", bbox_inches = "tight", dpi = 900)
+    _savefig(f"plotting/{flux}_{detector}_unsmeared_spectrum_{iron_thickness}mm.svg", bbox_inches = "tight", dpi = 900)
     plt.close()
 
 def plot_unsmeared_events_argon(flux, detector):
+
     total_events = 0
     for channel in ARGON_CHANNELS.keys():
         events_load = load_events_data(flux, detector, channel, smeared = False)
@@ -111,7 +127,7 @@ def plot_unsmeared_events_argon(flux, detector):
     plt.grid(True, alpha = 0.3)
     #plt.title(f"Unsmeared spectrum {detector}, {flux}, {iron_thickness}mm")
     plt.text(x = 0.71, y = 0.5, s = f"Total: {total_events:.2f}", transform = plt.gca().transAxes, ha = "left", va = "top")
-    plt.savefig(f"plotting/{flux}_{detector}_unsmeared_spectrum.svg", bbox_inches = "tight", dpi = 900)
+    _savefig(f"plotting/{flux}_{detector}_unsmeared_spectrum.svg", bbox_inches = "tight", dpi = 900)
     plt.close()
 
 def plot_distribution_matrix(channel, iron_thickness):
@@ -123,7 +139,7 @@ def plot_distribution_matrix(channel, iron_thickness):
     plt.ylabel(r"LAr deposited energy [MeV]")
     plt.title(f"LAr energy deposition distribution for {channel}, {iron_thickness}mm")
     plt.colorbar(label = "Probability")
-    plt.savefig(f"plotting/energy_distribution_matrix_{channel}_{iron_thickness}mm.svg", bbox_inches = "tight", dpi = 900)
+    _savefig(f"plotting/energy_distribution_matrix_{channel}_{iron_thickness}mm.svg", bbox_inches = "tight", dpi = 900)
     plt.close()
 
 
@@ -146,13 +162,14 @@ def plot_hist_neutrino_energy(channel, iron_thickness, energy):
     plt.title(fr"$E_{{dep}}$ in LAr distribution for $E_\nu$ = {energy} MeV, {channel}, {iron_thickness}mm")
     plt.xlabel("Edep [MeV]")
     plt.ylabel("Event counts")
-    plt.savefig(f"plotting/{energy}_MeV_distribution_{channel}_{iron_thickness}mm.svg", bbox_inches = "tight", dpi = 900)
+    _savefig(f"plotting/{energy}_MeV_distribution_{channel}_{iron_thickness}mm.svg", bbox_inches = "tight", dpi = 900)
     plt.close()
 
 def calculate_efficiencies(channel, iron_thickness, dep_threshold):
+
     scan_min_energy = MODEL_INFORMATION[channel]["scan_min_energy"]
 
-    energies = 0.5 * (ENERGY_GRID[:-1] + ENERGY_GRID[1:])
+    energies = ENERGY_BIN_CENTERS
 
     efficiencies = np.zeros(len(energies))
 
@@ -170,7 +187,7 @@ def calculate_efficiencies(channel, iron_thickness, dep_threshold):
 def plot_deposition_efficiency(channel, iron_thickness, dep_threshold):
 
     scan_min_energy = MODEL_INFORMATION[channel]["scan_min_energy"]
-    energies = 0.5 * (ENERGY_GRID[:-1] + ENERGY_GRID[1:])
+    energies = ENERGY_BIN_CENTERS
     mask = energies >= scan_min_energy
     efficiencies = calculate_efficiencies(channel, iron_thickness, dep_threshold)
 
@@ -179,13 +196,14 @@ def plot_deposition_efficiency(channel, iron_thickness, dep_threshold):
     plt.ylabel(f"Fraction of events with Edep > {dep_threshold} MeV")
     plt.grid(True, alpha = 0.3)
     plt.title(f"Event fraction with deposition energy > {dep_threshold} MeV, {channel}, {iron_thickness}mm")
-    plt.savefig(f"plotting/effiency_fraction_{channel}_{iron_thickness}mm_{dep_threshold}_MeV.svg", bbox_inches = "tight", dpi = 900)
+    _savefig(f"plotting/effiency_fraction_{channel}_{iron_thickness}mm_{dep_threshold}_MeV.svg", bbox_inches = "tight", dpi = 900)
     plt.close()
 
 def calculate_visible_events(channel, iron_thickness, dep_threshold):
+
     detector = f"FDSteel_{iron_thickness}mm"
     events_load = load_events_data("garching", detector, channel, smeared = False)
-    events_weighted = events_load * IRON_CHANNELS[channel] 
+    events_weighted = events_load * IRON_CHANNELS[channel]
     efficiencies = calculate_efficiencies(channel, iron_thickness, dep_threshold)
     events_visible = events_weighted * efficiencies
     print("Iron Thickness: ", iron_thickness, "mm")
@@ -198,6 +216,7 @@ def calculate_visible_events(channel, iron_thickness, dep_threshold):
     return sum(events_visible)
 
 def plot_different_efficiencies(channel, iron_thickness):
+
     thresholds = [0.0, 0.5, 1.0, 5.0]
     print("Plotting for: ", channel)
     for threshold in thresholds:
@@ -206,16 +225,16 @@ def plot_different_efficiencies(channel, iron_thickness):
 def plot_one_channel_smeared_unsmeared(flux, channel, detector, iron_thickness):
 
     energy = ENERGY_GRID
-    bin_centers = 0.5 * (ENERGY_GRID[:-1] + ENERGY_GRID[1:])
+    bin_centers = ENERGY_BIN_CENTERS
     weight = MODEL_INFORMATION[channel]["weight"]
 
     events_smeared = load_events_data(flux, detector, channel, smeared = True, suffix = "")
     events_unsmeared = load_events_data(flux, detector, channel, smeared = False)
     mask = bin_centers > 5
-    
+
     events_smeared_w = events_smeared * weight
     events_smeared_5MeV_w = events_smeared[mask] * weight
-    events_unsmeared_w = events_unsmeared * weight 
+    events_unsmeared_w = events_unsmeared * weight
 
 
     plt.stairs(events_smeared_w, energy, label="Smeared: LAr deposited E", color="blue")
@@ -230,13 +249,14 @@ Events with $E_{{dep}}$ > 5 MeV: {events_smeared_5MeV_w.sum():.2f}""",transform=
     plt.legend()
     plt.grid(True, alpha=0.3)
     plt.title(f"Smeared vs. unsmeared signal, {flux} flux, {channel}, {detector}")
-    plt.savefig(f"plotting/{flux}_{channel}_{detector}_smeared_unsmeared_{iron_thickness}mm_5MeV.svg", bbox_inches="tight", dpi=900)
+    _savefig(f"plotting/{flux}_{channel}_{detector}_smeared_unsmeared_{iron_thickness}mm_5MeV.svg", bbox_inches="tight", dpi=900)
     plt.close()
 
 def plot_all_iron_channels_smeared(flux, iron_thickness):
+    """Plot diagnostic or expected counts; energy arguments are in MeV."""
     detector = f"FDSteel_{iron_thickness}mm"
 
-    total_events = np.zeros(200)
+    total_events = np.zeros(len(ENERGY_BIN_CENTERS))
     for channel in MODEL_INFORMATION.keys():
         events_smeared = load_events_data(flux, detector, channel, smeared = True)
         weight = MODEL_INFORMATION[channel]["weight"]
@@ -245,8 +265,7 @@ def plot_all_iron_channels_smeared(flux, iron_thickness):
         plt.stairs(events_smeared_w, ENERGY_GRID, label = channel, baseline= None)
 
     print("unmasked: ", total_events)
-
-    bin_centers = 0.5 * (ENERGY_GRID[:-1] + ENERGY_GRID[1:])
+    bin_centers = ENERGY_BIN_CENTERS
     mask = bin_centers > 5
     total_events_mask = total_events[mask]
     print("masked: ", total_events_mask)
@@ -260,9 +279,9 @@ def plot_all_iron_channels_smeared(flux, iron_thickness):
 Events with $E_{{th}}$ = 5 MeV: {total_events_mask.sum():.2f}""",transform=plt.gca().transAxes, linespacing = 1.4)#,ha="right",va="top")
     plt.grid(True, alpha = 0.3)
     plt.title(f"{detector}, {flux}, {iron_thickness}mm, all iron channel")
-    plt.savefig(f"plotting/{flux}_{detector}_iron_all_channels_smeared.svg", bbox_inches = "tight", dpi = 900)
+    _savefig(f"plotting/{flux}_{detector}_iron_all_channels_smeared.svg", bbox_inches = "tight", dpi = 900)
     plt.close()
-    total_argon_events = 1047
+    total_argon_events = calculate_argon_total(flux)
     print("There are a total of ", total_argon_events, " events with deposited energy > 5 MeV on argon.")
     print("For the cryostat model with an iron thickness of ", iron_thickness, "mm, there is a total of " \
     fr"{total_events.sum():.2f} events. {total_events_mask.sum():.2f} events with deposited energy > 5 MeV.")
@@ -272,8 +291,8 @@ Events with $E_{{th}}$ = 5 MeV: {total_events_mask.sum():.2f}""",transform=plt.g
 
 def plot_all_argon_channels_smeared(flux, detector):
 
-    total_events = np.zeros(200)
-    total_eES_events = np.zeros(200)
+    total_events = np.zeros(len(ENERGY_BIN_CENTERS))
+    total_eES_events = np.zeros(len(ENERGY_BIN_CENTERS))
 
     for channel in ARGON_CHANNELS.keys():
         events_smeared = load_events_data(flux, detector, channel, smeared = True)
@@ -286,15 +305,13 @@ def plot_all_argon_channels_smeared(flux, detector):
         if channel == "nuebar_Ar40":
             plt.stairs(events_smeared_w, ENERGY_GRID, label = r"$\bar\nu_e$ CC on Ar40", baseline= None)
         total_events += events_smeared_w
-    
+
 
     print("unmasked: ", total_events)
-
-    bin_centers = 0.5 * (ENERGY_GRID[:-1] + ENERGY_GRID[1:])
+    bin_centers = ENERGY_BIN_CENTERS
     mask = bin_centers > 5
     total_events_mask = total_events[mask]
     print("masked: ", total_events_mask)
-
 
 
     plt.stairs(total_eES_events, ENERGY_GRID, label = "Total eES", baseline= None)
@@ -321,16 +338,17 @@ def plot_all_argon_channels_smeared(flux, detector):
 Events with $E_{{th}}$ = 5 MeV: {total_events_mask.sum():.0f}""",transform=plt.gca().transAxes, linespacing = 1.4, fontsize = 12)#,ha="right",va="top")
     plt.grid(True, alpha = 0.3)
     #plt.title(f"{detector}, {flux}, {iron_thickness}mm, all iron channel")
-    plt.savefig(f"plotting/{flux}_{detector}_argon_all_channels_smeared.svg", bbox_inches = "tight", dpi = 900)
+    _savefig(f"plotting/{flux}_{detector}_argon_all_channels_smeared.svg", bbox_inches = "tight", dpi = 900)
     plt.close()
 
 def compare_deposition_effiencies(channel, dep_threshold):
+
     iron_thicknesses = [1.2, 12, 62.7]
     print("Threshold: ", dep_threshold)
     for iron_thickness in iron_thicknesses:
         print("Calculating for: ", iron_thickness)
         scan_min_energy = MODEL_INFORMATION[channel]["scan_min_energy"]
-        energies = 0.5 * (ENERGY_GRID[:-1] + ENERGY_GRID[1:])
+        energies = ENERGY_BIN_CENTERS
         mask = energies >= scan_min_energy
         efficiencies = calculate_efficiencies(channel, iron_thickness, dep_threshold)
 
@@ -341,13 +359,13 @@ def compare_deposition_effiencies(channel, dep_threshold):
     plt.legend()
     plt.grid(True, alpha = 0.3)
     plt.title(f"Comparison of event fraction with deposition energy > {dep_threshold} MeV, {channel}")
-    plt.savefig(f"plotting/comparison_effiency_fraction_{channel}_{dep_threshold}_MeV.svg", bbox_inches = "tight", dpi = 900)
+    _savefig(f"plotting/comparison_effiency_fraction_{channel}_{dep_threshold}_MeV.svg", bbox_inches = "tight", dpi = 900)
     plt.close()
-    
+
 
 def bar_plot_event_count_comparison(flux, channel):
 
-    bin_centers = 0.5 * (ENERGY_GRID[:-1] + ENERGY_GRID[1:])
+    bin_centers = ENERGY_BIN_CENTERS
     mask_5MeV = bin_centers > 5
 
     weight = MODEL_INFORMATION[channel]["weight"]
@@ -362,7 +380,7 @@ def bar_plot_event_count_comparison(flux, channel):
     for detector in detectors:
 
         raw = load_events_data(flux,detector,channel,smeared=False)* weight
-        
+
 
         smeared = load_events_data(flux,detector,channel,smeared=True)* weight
 
@@ -396,14 +414,14 @@ def bar_plot_event_count_comparison(flux, channel):
 
     plt.tight_layout()
 
-    plt.savefig(f"plotting/{flux}_{channel}_event_count_comparison.svg",bbox_inches="tight",dpi=900)
+    _savefig(f"plotting/{flux}_{channel}_event_count_comparison.svg",bbox_inches="tight",dpi=900)
 
     plt.close()
 
 def bar_plot_all_channels(flux):
-    bin_centers = 0.5 * (ENERGY_GRID[:-1] + ENERGY_GRID[1:])
+
+    bin_centers = ENERGY_BIN_CENTERS
     mask_5MeV = bin_centers > 5
-    
 
 
     thicknesses = [1.2, 12, 62.7]
@@ -456,52 +474,24 @@ def bar_plot_all_channels(flux):
 
     plt.tight_layout()
 
-    plt.savefig(f"plotting/{flux}_all_channels_event_count_comparison.svg",bbox_inches="tight",dpi=900)
+    _savefig(f"plotting/{flux}_all_channels_event_count_comparison.svg",bbox_inches="tight",dpi=900)
 
     plt.close()
 
 
+def calculate_argon_total(flux="garching", detector="ar40kt"):
+
+    spectrum = sum(load_events_data(flux, detector, channel, True) * weight for channel, weight in ARGON_CHANNELS.items())
+
+    return spectrum[ENERGY_BIN_CENTERS > 5].sum()
+
+
 if __name__ == "__main__":
-    #unsmeared_events("garching", "FD_modul_Fe")
-    #print(load_events_data("garching", "FD_modul_Fe", "nue_e", False))
-    #energy = ENERGY_GRID[0]
-    #plot_one_channel_smeared_unsmeared("garching", "nue_Fe56", "FDSteel_62.7mm", 62.7)
-    '''CHANNEL = "nutaubar_e"
-    plot_distribution_matrix(CHANNEL, 62.7)
-    plot_deposition_efficiency(CHANNEL, iron_thickness=62.7, dep_threshold=0.0)
-    plot_deposition_efficiency(CHANNEL, iron_thickness=62.7, dep_threshold=5.0)
-    #plot_unsmeared_events_iron("garching", "FDSteel_1.2mm", 1.2)'''
 
     plot_all_argon_channels_smeared("garching", "ar40kt")
+
+    #plot_all_iron_channels_smeared("garching", 12)
+    #plot_distribution_matrix("nue_Fe56", 12)
+    #plot_one_channel_smeared_unsmeared("garching", "nue_Fe56", "FDSteel_12mm", 12)
+    #plot_deposition_efficiency("nue_Fe56", 12, 5)
     #bar_plot_all_channels("garching")
-    #bar_plot_event_count_comparison("garching", "nue_Fe56")
-    #plot_all_iron_channels_smeared("garching", 62.7)
-    #compare_deposition_effiencies("nue_Fe56", 5)
-    #compare_deposition_effiencies("nue_Fe56", 0)
-    #compare_deposition_effiencies("nue_Fe56", 1 )
-    #compare_deposition_effiencies("nuebar_Fe56", 5)
-    #compare_deposition_effiencies("nuebar_Fe56", 0)
-    #compare_deposition_effiencies("nuebar_Fe56", 1 )
-    #plot_unsmeared_events_argon("garching", "ar40kt")
-    #plot_all_argon_channels_smeared("garching", "ar40kt")
-    #plot_all_iron_channels_smeared("garching", 1.2)
-    #for channel in MODEL_INFORMATION.keys():
-     #   calculate_visible_events(channel, IRON_THICKNESS_MM, 5.0)
-    #plot_unsmeared_events("garching", "FD_modul_Fe", IRON_THICKNESS_MM)
-    #CHANNEL = "nuebar_Fe56"
-    #plot_distribution_matrix(CHANNEL, IRON_THICKNESS_MM)
-    #plot_hisneutrino_energy(CHANNEL, IRON_THICKNESS_MM, 20.15125)
-    #plot_deposition_efficiency("nue_Fe56", iron_thickness= 1.2, dep_threshold= 0.0)
-    #plot_deposition_efficiency(CHANNEL, IRON_THICKNESS_MM, 1.0)
-    #plot_deposition_efficiency("nue_Fe56", iron_thickness=1.2, dep_threshold=5.0)
-    #calculate_visible_events(CHANNEL1, IRON_THICKNESS_MM, 0.0)
-    #calculate_visible_events(CHANNEL1, IRON_THICKNESS_MM, 5.0)
-    #calculate_visible_events(CHANNEL2, IRON_THICKNESS_MM, 0.0)
-    #calculate_visible_events(CHANNEL2, IRON_THICKNESS_MM, 5.0)
-    #channels = ["nue_e", "nuebar_e", "numu_e", "numubar_e", "nutau_e", "nutaubar_e"]
-    #for channel in channels:
-        #plot_different_efficiencies(channel, IRON_THICKNESS_MM)
-     #   plot_distribution_matrix(channel, IRON_THICKNESS_MM)
-    #plot_distribution_matrix("nue_e", IRON_THICKNESS_MM)
-    #plot_hist_neutrino_energy("nue_e", IRON_THICKNESS_MM, 99.75125)
-    #plot_deposition_efficiency("nue_e", IRON_THICKNESS_MM, 0.0)

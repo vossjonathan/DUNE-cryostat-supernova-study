@@ -1,10 +1,12 @@
 import numpy as np
-from pathlib import Path
-from config import MODEL_INFORMATION, ENERGY_GRID, ARGON_CHANNELS
+from config import MODEL_INFORMATION, ARGON_CHANNELS, SNOWGLOBES_DIR, ENERGY_BIN_CENTERS
 
-EFFIC = Path.home()/"software"/"snowglobes"/"effic"
+EFFIC = SNOWGLOBES_DIR / "effic"
 
 def calculate_iron_mass(iron_thickness): #in mm
+
+    if not np.isfinite(iron_thickness) or iron_thickness <= 0:
+        raise ValueError("iron_thickness must be finite and positive")
     iron_density = 7.87 * 1000 #in kg / m^3
     iron_thickness = iron_thickness / 1000 #in m
 
@@ -28,6 +30,9 @@ def calculate_iron_mass(iron_thickness): #in mm
 #calculate iron thicknes for the only iron cryostat model
 #The iron is directly next to the LAr
 def calculate_effective_iron_thickness_onlyiron(mass_t): #in t
+
+    if not np.isfinite(mass_t) or mass_t <= 0:
+        raise ValueError("mass_t must be finite and positive")
     mass_kg = 1000 * mass_t
     iron_density = 7.87 * 1000 #in kg / m^3
 
@@ -41,13 +46,13 @@ def calculate_effective_iron_thickness_onlyiron(mass_t): #in t
     quadratic_coef = 4*(argon_length + argon_height + argon_width)
     linear_coef = 2*(argon_height*argon_width + argon_length*argon_width+argon_length*argon_height)
     const_coef =  - iron_volume
-    coefficients = [cubic_coef, quadratic_coef, linear_coef, const_coef]  
+    coefficients = [cubic_coef, quadratic_coef, linear_coef, const_coef]
 
     roots = np.roots(coefficients)
 
-    positive_real_root = [root.real for root in roots if root.imag == 0 and root.real > 0]
+    positive_real_root = [root.real for root in roots if np.isclose(root.imag, 0) and root.real > 0]
     if len(positive_real_root) != 1:
-        raise ValueError("Unexpected roots: ", roots)
+        raise ValueError(f"Expected one positive real physical root; got {roots}")
 
     return positive_real_root[0] * 1000 # in mm
 
@@ -55,6 +60,9 @@ def calculate_effective_iron_thickness_onlyiron(mass_t): #in t
 #calculates thickness of outer iron layer
 #uses the more complex cryostat model including a 80cm polyurethane layer between the primary iron membrane and outer iron structure
 def calculate_outer_iron_thickness_with_PU(mass_t): #in t
+
+    if not np.isfinite(mass_t) or mass_t <= 0:
+        raise ValueError("mass_t must be finite and positive")
     mass_kg = 1000 * mass_t
     iron_density = 7.87 * 1000 #in kg / m^3
 
@@ -75,25 +83,26 @@ def calculate_outer_iron_thickness_with_PU(mass_t): #in t
     quadratic_coef = 4*(combined_length + combined_height + combined_width)
     linear_coef = 2*(combined_height*combined_width + combined_length*combined_width+combined_length*combined_height)
     const_coef =  - iron_volume
-    coefficients = [cubic_coef, quadratic_coef, linear_coef, const_coef]  
+    coefficients = [cubic_coef, quadratic_coef, linear_coef, const_coef]
 
     roots = np.roots(coefficients)
 
-    positive_real_root = [root.real for root in roots if root.imag == 0 and root.real > 0]
+    positive_real_root = [root.real for root in roots if np.isclose(root.imag, 0) and root.real > 0]
     if len(positive_real_root) != 1:
-        raise ValueError("Unexpected roots: ", roots)
+        raise ValueError(f"Expected one positive real physical root; got {roots}")
 
     return positive_real_root[0] * 1000 # in mm
 
 
 def apply_snowglobes_threshold(detector, material, threshold):
-    
+
     if material == "iron":
         lookup = MODEL_INFORMATION
     elif material == "argon":
         lookup = ARGON_CHANNELS
-
-    bin_centers = 0.5 * (ENERGY_GRID[:-1] + ENERGY_GRID[1:])
+    else:
+        raise ValueError(f"Unsupported material {material!r}; choose iron or argon")
+    bin_centers = ENERGY_BIN_CENTERS
 
     values = (bin_centers > threshold).astype(float)
 
@@ -101,12 +110,10 @@ def apply_snowglobes_threshold(detector, material, threshold):
 
         file = EFFIC / detector / f"effic_{channel}_{detector}.dat"
 
+        file.parent.mkdir(parents=True, exist_ok=True)
         with open(file, "w") as f:
             f.write("{" + ",".join(f"{x:.1f}" for x in values) + "}\n")
 
 
-
 if __name__ == "__main__":
-    #apply_snowglobes_threshold("ar40kt", "argon", 0)
-    #print(calculate_effective_iron_thickness_onlyiron(2000))
     print(calculate_outer_iron_thickness_with_PU(2000))

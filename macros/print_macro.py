@@ -1,29 +1,26 @@
-from config import ENERGY_GRID
 from pathlib import Path
 import numpy as np
-from config import MODEL_INFORMATION, DATA_LOOKUP
+from config import MODEL_INFORMATION, DATA_LOOKUP, GEANT4_BUILD_DIR, ENERGY_BIN_CENTERS
 
-FDSteel = Path.home()/"software"/"geant4"/"geant4-work"/"FDSteel"
+def _validate(n_events, n_jobs):
+    for name, value in (("n_events", n_events), ("n_jobs", n_jobs)):
+        if isinstance(value, bool) or not isinstance(value, (int, np.integer)) or value <= 0:
+            raise ValueError(f"{name} must be a positive integer")
 
 
-
-def macro_Geant4_Marley_only_iron(n_events, n_jobs, channel, iron_thickness):
+def macro_Geant4_Marley_only_iron(n_events, n_jobs, channel, iron_thickness, output_dir=None):
+    _validate(n_events, n_jobs)
+    if channel not in MODEL_INFORMATION or iron_thickness not in MODEL_INFORMATION[channel]["simulations"]:
+        raise ValueError("Unsupported historical channel or iron thickness")
+    simulation = MODEL_INFORMATION[channel]["simulations"][iron_thickness]
 
     min_energy = MODEL_INFORMATION[channel]["scan_min_energy"]
-
     macro_dir = f"marley_scan_100k_{iron_thickness}mm_Fe_{channel}"
-    output_dir = f"marley_Fe56_100k_{iron_thickness}mm_{channel}"
-
-    bin_edges = ENERGY_GRID
-    bin_centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
+    bin_centers = ENERGY_BIN_CENTERS
     bin_centers = bin_centers[bin_centers >= min_energy]
-
-    build_dir = FDSteel / "build"
-
-    macro_path = build_dir / "macros"/macro_dir
-    output_path = build_dir /"root_data"/f"{iron_thickness}mm"/output_dir
-
-
+    build_dir = GEANT4_BUILD_DIR
+    macro_path = Path(output_dir) if output_dir is not None else build_dir / "macros"/macro_dir
+    output_path = simulation["folder"]
 
     macro_path.mkdir(parents=True, exist_ok=True)
     output_path.mkdir(parents=True, exist_ok=True)
@@ -46,38 +43,33 @@ def macro_Geant4_Marley_only_iron(n_events, n_jobs, channel, iron_thickness):
                 print(
                     f"/analysis/setFileName "
                     f"{output_path}/"
-                    f"MARLEY_{E:.5f}_{channel}_ALLOWED_Fe56_{iron_thickness}mm.root",
+                    f"{simulation['filename'].format(E=E)}",
                     file=f
                 )
 
                 print(f"/run/beamOn {n_events}\n", file=f)
-        
-    print("for i in {1..8}; do\n"
-    f"./exampleB1 macros/{macro_dir}/marleyScan100k${{i}}.mac &\n"
+
+    print(f"for i in {{1..{n_jobs}}}; do\n"
+    f'./exampleB1 "{macro_path}/marleyScan100k${{i}}.mac" &\n'
     "done")
 
-def macro_Geant4_Marley_PU_iron(n_events, n_jobs, channel, layer):
+def macro_Geant4_Marley_PU_iron(n_events, n_jobs, channel, layer, output_dir=None):
+    _validate(n_events, n_jobs)
+    if layer not in DATA_LOOKUP or channel not in DATA_LOOKUP[layer]["channels"]:
+        raise ValueError("Unsupported final-model layer/channel")
 
     config = DATA_LOOKUP[layer]["channels"][channel]
 
-    
-
-
     min_energy = config["scan_min_energy"]
     nuFlavor= config["pdg"]
-
     macro_dir = f"marley_scan100k_{layer}_{channel}"
-    output_dir = f"marley_scan100k_{layer}_{channel}"
-
-    bin_edges = ENERGY_GRID
-    bin_centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
+    bin_centers = ENERGY_BIN_CENTERS
     bin_centers = bin_centers[bin_centers >= min_energy]
-
-    build_dir = FDSteel / "build"
-
+    build_dir = GEANT4_BUILD_DIR
     macro_path = build_dir / "macros"/macro_dir
-    output_path = build_dir /"root_data"/"iron_PU"/f"{layer}"/output_dir
-
+    output_path = config["folder"]
+    if output_dir is not None:
+        macro_path = Path(output_dir)
 
 
     macro_path.mkdir(parents=True, exist_ok=True)
@@ -103,31 +95,27 @@ def macro_Geant4_Marley_PU_iron(n_events, n_jobs, channel, layer):
                 print(
                     f"/analysis/setFileName "
                     f"{output_path}/"
-                    f"MARLEY_{E:.5f}_{channel}_{layer}.root",
+                    f"{config['filename'].format(E=E)}",
                     file=f
                 )
 
                 print(f"/run/beamOn {n_events}\n", file=f)
-        
-    print("for i in {1..8}; do\n"
-    f"./exampleB1 macros/{macro_dir}/marleyScan100k${{i}}.mac &\n"
+
+    print(f"for i in {{1..{n_jobs}}}; do\n"
+    f'./exampleB1 "{macro_path}/marleyScan100k${{i}}.mac" &\n'
     "done")
 
-def macro_IBD(n_events):
+def macro_IBD(n_events, output_dir=None, n_jobs=8):
+    _validate(n_events, n_jobs)
 
     config = DATA_LOOKUP["PU"]["channels"]["ibd"]
     min_energy = config["scan_min_energy"]
 
-
-    bin_edges = ENERGY_GRID
-    bin_centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
+    bin_centers = ENERGY_BIN_CENTERS
     bin_centers = bin_centers[bin_centers >= min_energy]
-
-    build_dir = FDSteel / "build"
-
-    macro_path = build_dir / "macros"
+    build_dir = GEANT4_BUILD_DIR
+    macro_path = Path(output_dir) if output_dir is not None else build_dir / "macros"
     output_path = config["folder"]
-
 
 
     macro_path.mkdir(parents=True, exist_ok=True)
@@ -135,7 +123,7 @@ def macro_IBD(n_events):
 
     with open(macro_path / f"IBD_scan.mac", "w") as f:
 
-        print("/run/numberOfThreads 8", file=f)
+        print(f"/run/numberOfThreads {n_jobs}", file=f)
         print("/run/initialize", file=f)
         print("/tracking/storeTrajectory 0", file=f)
         print("/run/printProgress 10000\n", file=f)
@@ -155,15 +143,15 @@ def macro_IBD(n_events):
             )
 
             print(f"/run/beamOn {n_events}\n", file=f)
-        
+
 
 def macro_Geant4_Marley_missing(n_events=100000, n_jobs=8):
+    _validate(n_events, n_jobs)
+    simulation = MODEL_INFORMATION["nue_Fe56"]["simulations"][12]
+    simulation["folder"].mkdir(parents=True, exist_ok=True)
 
-    bin_edges = np.asarray(ENERGY_GRID, dtype=float)
-    bin_centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
-
-    build_dir = FDSteel / "build"
-
+    bin_centers = ENERGY_BIN_CENTERS
+    build_dir = GEANT4_BUILD_DIR
     macro_dir = (
         build_dir
         / "macros"
@@ -196,7 +184,7 @@ def macro_Geant4_Marley_missing(n_events=100000, n_jobs=8):
         f"-> {missing_energies[-1]:.5f} MeV"
     )
 
-    # Redistribute missing energies over 8 NEW jobs
+    # Redistribute missing energies over the requested number of recovery jobs
     for job in range(n_jobs):
 
         energies = missing_energies[job::n_jobs]
@@ -223,8 +211,7 @@ def macro_Geant4_Marley_missing(n_events=100000, n_jobs=8):
 
                 print(
                     "/analysis/setFileName "
-                    "root_data/marley_CC_nue_Fe56_100k_12mm/"
-                    f"MARLEY_{E:.5f}_CC_nue_ALLOWED_Fe56_12mm.root",
+                    f"{simulation['folder']}/{simulation['filename'].format(E=E)}",
                     file=f
                 )
 
@@ -243,13 +230,17 @@ def macro_Geant4_Marley_missing(n_events=100000, n_jobs=8):
             )
 
 
-
 if __name__ == "__main__":
-    #macro_Geant4_Marley(100000, 8, channel = "numubar_e", iron_thickness=62.7)
-    #macro_Geant4_Marley_missing()
-    #macro_Geant4_Marley_PU_iron(100000, 8, "nue_Fe56", "OuterIron")
-    '''    for layer in ["PrimaryIron", "OuterIron"]:
-        channels = ["nuebar_Fe56", "nue_e", "nuebar_e", "numu_e", "numubar_e"]
-        for channel in channels:
-            macro_Geant4_Marley_PU_iron(100000, 8, channel, layer)'''
+
+    # Generate IBD scan
     macro_IBD(100000)
+
+    # Generate MARLEY scans for the final cryostat model
+    #macro_Geant4_Marley_PU_iron(100000, 8, "nue_Fe56", "PrimaryIron")
+    #macro_Geant4_Marley_PU_iron(100000, 8, "nue_Fe56", "OuterIron")
+
+    # Historical only-iron model
+    #macro_Geant4_Marley_only_iron(100000, 8, "nue_Fe56", 12)
+
+    # Recover missing historical simulation points
+    #macro_Geant4_Marley_missing()
