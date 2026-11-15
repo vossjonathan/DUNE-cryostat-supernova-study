@@ -3,13 +3,11 @@
 {
   seed: 123456, // Random number seed (omit to use time since Unix epoch)
 
-  // Pure 208Pb target
   target: {
     nuclides: [ 1000260560 ],
     atom_fractions: [ 1.0 ],
   },
   form_factors: "allowed",
-  // Simulate ve scattering on 40Ar:
   reactions: [
     // Charged-current interactions on the nucleus using the
     // recommended MARLEY v2 cross-section models for both

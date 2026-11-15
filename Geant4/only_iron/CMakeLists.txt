@@ -19,28 +19,17 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(Geant4 REQUIRED ui_all vis_all)
 
 
-#----------------------------------------------------------------------------
-# MARLEY / HepMC3 locations
-#
-set(MARLEY_DIR "$ENV{HOME}/software/marley" CACHE PATH "Path to MARLEY installation")
+set(MARLEY_DIR "$ENV{HOME}/software/marley"
+    CACHE PATH "Path to MARLEY installation")
 
-set(HEPMC3_INCLUDE_DIR
-    "${MARLEY_DIR}/include/builtin"
-)
+set(MARLEY_INCLUDE_DIR "${MARLEY_DIR}/include")
+set(HEPMC3_INCLUDE_DIR "${MARLEY_DIR}/include/builtin")
 
 set(MARLEY_LIBRARY
-    "${MARLEY_DIR}/build/lib/libMARLEY.so"
-)
+    "${MARLEY_DIR}/build/lib/libMARLEY.so")
 
 set(HEPMC3_LIBRARY
-    "${MARLEY_DIR}/build/lib/libHepMC3.so"
-)
-
-
-# Find the directory which contains HepMC3/GenEvent.h
-set(HEPMC3_INCLUDE_DIR
-    "/home/jonat/software/marley/include/builtin"
-)
+    "${MARLEY_DIR}/build/lib/libHepMC3.so")
 
 
 

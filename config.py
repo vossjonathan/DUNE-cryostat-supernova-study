@@ -1,65 +1,54 @@
-"""Paths and unchanged scientific configuration for historical and final studies."""
 import numpy as np
 from pathlib import Path
 import os
 
-IRON_THICKNESS_MM = 62.7 #1.2mm lower bound
-# Electron scattering is per atomic electron: Ar has 18, Fe has 26.
-ARGON_CHANNELS = {
-        "nue_Ar40" : 1,
-        "nuebar_Ar40" : 1,
-        "nue_e" : 18,
-        "nuebar_e" : 18,
-        "numu_e" : 18,
-        "numubar_e" : 18,
-        "nutau_e" : 18,
-        "nutaubar_e" : 18,
-        #"nc_nue_Ar40" : 1,
-        #"nc_nuebar_Ar40" : 1,
-        #"nc_numu_Ar40" : 1,
-        #"nc_numubar_Ar40" : 1,
-        #"nc_nutau_Ar40" : 1,
-        #"nc_nutaubar_Ar40" : 1
 
-    }
-
-
-
-IRON_CHANNELS = {
-        "nue_e" : 26,
-        "nuebar_e" : 26,
-        "numu_e" : 26,
-        "numubar_e" : 26,
-        "nutau_e" : 26,
-        "nutaubar_e" : 26,
-        "nue_Fe56" : 1,
-        "nuebar_Fe56" : 1,
-        "nc_nue_Fe56" : 1,
-        "nc_nuebar_Fe56" : 1,
-        "nc_numu_Fe56" : 1,
-        "nc_numubar_Fe56" : 1,
-        "nc_nutau_Fe56" : 1,
-        "nc_nutaubar_Fe56" : 1,
-    }
+IRON_THICKNESS_MM = 62.7
 
 ENERGY_GRID = np.linspace(0.5, 100, 201)
-
-
-PROJECT_ROOT = Path(__file__).resolve().parent
-
-# Environment overrides preserve external simulation data in its existing location.
-GEANT4_BUILD_DIR = Path(os.environ.get("GEANT4_BUILD_DIR", PROJECT_ROOT / "Geant4" / "build")).expanduser()
-ROOT_DATA = Path(os.environ.get("FDSTEEL_ROOT_DATA", PROJECT_ROOT / "data" / "root")).expanduser()
-SNOWGLOBES_DIR = Path(os.environ.get("SNOWGLOBES_DIR", PROJECT_ROOT / "snowglobes")).expanduser()
-PLOT_DIR = Path(os.environ.get("PLOT_DIR", PROJECT_ROOT / "figures" / "python")).expanduser()
-SNOWGLOBES = SNOWGLOBES_DIR  # Compatibility for existing Python callers.
 ENERGY_BIN_CENTERS = 0.5 * (ENERGY_GRID[:-1] + ENERGY_GRID[1:])
 
-# Historical only-iron model; thicknesses are in mm.
-# Neutral-current entries in IRON_CHANNELS are historical, not final simulations.
-# Muon/tau electron scattering shares the same neutral-current response at
-# these energies; antineutrinos likewise reuse the corresponding antimuon files.
-#simplified model only one iron layer 
+
+# Local paths (can be overridden using environment variables)
+PROJECT_ROOT = Path(__file__).resolve().parent
+
+GEANT4_BUILD_DIR = Path(os.environ.get("GEANT4_BUILD_DIR", Path.home() / "software/geant4/geant4-work/FDSteel/build")).expanduser()
+
+ROOT_DATA = Path(os.environ.get("FDSTEEL_ROOT_DATA", GEANT4_BUILD_DIR / "root_data")).expanduser()
+
+SNOWGLOBES_DIR = Path(os.environ.get("SNOWGLOBES_DIR", Path.home() / "software/snowglobes")).expanduser()
+
+PLOT_DIR = Path(os.environ.get("PLOT_DIR", PROJECT_ROOT / "figures")).expanduser()
+
+
+# Number of target electrons per atom for elastic scattering
+ARGON_CHANNELS = {
+    "nue_Ar40": 1,
+    "nuebar_Ar40": 1,
+    "nue_e": 18,
+    "nuebar_e": 18,
+    "numu_e": 18,
+    "numubar_e": 18,
+    "nutau_e": 18,
+    "nutaubar_e": 18,
+}
+
+IRON_CHANNELS = {
+    "nue_e": 26,
+    "nuebar_e": 26,
+    "numu_e": 26,
+    "numubar_e": 26,
+    "nutau_e": 26,
+    "nutaubar_e": 26,
+    "nue_Fe56": 1,
+    "nuebar_Fe56": 1,
+    "nc_nue_Fe56": 1,
+    "nc_nuebar_Fe56": 1,
+    "nc_numu_Fe56": 1,
+    "nc_numubar_Fe56": 1,
+    "nc_nutau_Fe56": 1,
+    "nc_nutaubar_Fe56": 1,
+}
 MODEL_INFORMATION = {
     "nue_Fe56": {
         "pdg": 12,
