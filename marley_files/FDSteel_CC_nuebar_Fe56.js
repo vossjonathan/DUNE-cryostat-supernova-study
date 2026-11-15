@@ -1,5 +1,4 @@
-// Use this example job configuration file as a starting point for your own
-// files.
+
 {
   seed: 123456, // Random number seed (omit to use time since Unix epoch)
 
@@ -9,17 +8,14 @@
   },
   form_factors: "allowed",
   reactions: [
-    // Charged-current interactions on the nucleus using the
-    // recommended MARLEY v2 cross-section models for both
-    // continuum (HF-CRPA) and discrete (Bhattacharya2009)
-    // nuclear transitions
+
     "/home/jonat/software/marley/data/react/vebar56FeCC_Scott2014.react",
   ],
 
   // Neutrino source specification
   source: {
     type: "monoenergetic",
-    neutrino: "vebar",      // The source produces electron neutrinos
+    neutrino: "vebar",      // The source produces electron antineutrinos
     energy: 40,             // Minimum neutrino energy (MeV)           // Pinching parameter (dimensionless, default 0)
   },
 
