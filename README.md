@@ -28,7 +28,7 @@ The cryostat contribution corresponds to approximately 1.5% of the direct liquid
 
 These results represent first-order estimates based on a simplified cryostat geometry, interaction models, and detector response.
 
-A corresponding Technical Note describing the methodology and results in more detail is in preparation.
+For more details, see the [Technical Note (PDF)](Duke_DUNE_FD_Cryostat_Contribution_Study_Tech_Note_Jonathan_Voss.pdf) (WORK IN PROGRESS)
 
 ## Repository Structure
 
